@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- add `withPosition`, which runs a parser, and wraps the result with start and end position
 - rename to `«prefix»`, `«postfix»`, and `«mixfix»`
 
   The problem is `prefix` and `postfix` are keywords of lean, since we have to wrap the them with `«»`, then we also rename `binary` to follow the same style.

@@ -4,13 +4,20 @@ import Lean.Data.Position
 namespace Lean.Parsec
 open Parsec.ParseResult
 
-/-- `getPos` returns `Pos` of current state -/
+/-- `getPos` returns `String.Pos` of current state -/
 def getPos : Parsec String.Pos := fun it : String.Iterator =>
   success it it.pos
 
 /-- `getPosition` returns `Position` of current state -/
 def getPosition : Parsec Position := fun it : String.Iterator =>
   success it <| it.s.toFileMap.toPosition it.pos
+
+/-- `withPosition` runs a parser, and wraps the result with start and end position -/
+def withPosition {α} (p : Parsec α) (f : Position → Position → α → α) : Parsec α := do
+  let startPos ← getPosition
+  let result ← p
+  let endPos ← getPosition
+  return f startPos endPos result
 
 /-- `runFilename` will report pretty source location with `filepath`, line, column pair -/
 def runFilename (p : Parsec α) (filepath : System.FilePath) (s : String) : Except String α :=
