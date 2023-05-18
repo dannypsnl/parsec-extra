@@ -28,6 +28,6 @@ lake build
 Generate document
 
 ```shell
-lake update -Kenv=dev
+lake -Kenv=dev update
 lake -Kenv=dev build ParsecExtra:docs
 ```

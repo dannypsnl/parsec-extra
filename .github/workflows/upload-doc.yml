@@ -42,7 +42,7 @@ jobs:
         uses: actions/configure-pages@v3
       - name: Generate Document
         run: |
-          lake -Kenv=dev udpate
+          lake -Kenv=dev update
           lake -Kenv=dev build ParsecExtra:docs
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
