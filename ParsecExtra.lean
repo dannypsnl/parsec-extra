@@ -63,11 +63,13 @@ def parseInt : Parsec Int := do
 
 def parseExpr : Parsec Int :=
   parseInt
+  |> «prefix» [skipChar '-' *> return (- ·)]
   |> binary [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
   |> binary [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
 
 #eval parseExpr.run "1"
 #eval parseExpr.run "1+2*3"
+#eval parseExpr.run "-1+2*3"
 
 end test
 
