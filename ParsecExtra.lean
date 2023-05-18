@@ -42,7 +42,6 @@ def parens (p : Parsec a) : Parsec a := between (skipChar '(') p (skipChar ')')
 /-- `braces` wrap expression with braces `{` and `}` -/
 def braces (p : Parsec a) : Parsec a := between (skipChar '{') p (skipChar '}')
 
-
 /-!
 ## Expression Combinators
 
@@ -70,15 +69,13 @@ def parseExpr : Parsec Int :=
 def «mixfix» (opList : List (Parsec (α → α → α))) (tm : Parsec α)
   : Parsec α := do
   let l ← tm
-  let rs ← many opRhs
+  let rs ← many do
+    for findOp in opList do
+      match ← tryP findOp with
+      | .some f => return (f, ← tm)
+      | .none => continue
+    fail "cannot match any operator"
   return rs.foldl (fun lhs (bin, rhs) => (bin lhs rhs)) l
-  where
-    opRhs : Parsec ((α → α → α) × α) := do
-      for findOp in opList do
-        match ← tryP findOp with
-        | .some f => return ⟨ f, ← tm ⟩
-        | .none => continue
-      fail "cannot match operator"
 
 /-- `«prefix»` is a part of expression combinators, stands for operator like negative, e.g. `-3` -/
 def «prefix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
@@ -87,10 +84,9 @@ def «prefix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
   for findOp in opList do
     op ← tryP findOp
     if op.isSome then break
-  let e ← tm
   match op with
-  | .none => return e
-  | .some f => return f e
+  | .none => tm
+  | .some f => return f (← tm)
 
 /-- `«postfix»` is a part of expression combinators, stands for operator like factorial, e.g. `3!` -/
 def «postfix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
