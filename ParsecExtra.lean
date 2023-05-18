@@ -4,12 +4,15 @@ import Lean.Data.Position
 namespace Lean.Parsec
 open Parsec.ParseResult
 
+/-- `getPos` returns `Pos` of current state -/
 def getPos : Parsec String.Pos := fun it : String.Iterator =>
   success it it.pos
 
+/-- `getPosition` returns `Position` of current state -/
 def getPosition : Parsec Position := fun it : String.Iterator =>
   success it <| it.s.toFileMap.toPosition it.pos
 
+/-- `runFilename` will report pretty source location with `filepath`, line, column pair -/
 def runFilename (p : Parsec α) (filepath : System.FilePath) (s : String) : Except String α :=
   match p s.mkIterator with
   | .success _ res => Except.ok res
@@ -17,22 +20,46 @@ def runFilename (p : Parsec α) (filepath : System.FilePath) (s : String) : Exce
     let position := it.s.toFileMap.toPosition it.pos
     Except.error s!"{filepath}:{position.line}:{position.column}: {err}"
 
+/-- `tryP` run a parser, if fail then rollback and return `Option.none` -/
 def tryP (p : Parsec a) : Parsec (Option a) := λ it =>
   match p it with
   | .success rem a => .success rem a
   | .error _ _ => .success it .none
 
+private
 def between (before : Parsec Unit) (p : Parsec a) (after : Parsec Unit) := do
-  before; let r ← p; after; ws
+  before; ws; let r ← p; ws; after; ws
   return r
+/-- `parens` wrap expression with parenthesis `(` and `)` -/
 def parens (p : Parsec a) : Parsec a := between (skipChar '(') p (skipChar ')')
+/-- `braces` wrap expression with braces `{` and `}` -/
 def braces (p : Parsec a) : Parsec a := between (skipChar '{') p (skipChar '}')
 
-/-!
-binary is a part of expression combinators
 
-The correct way to expression combinators, is based on an atom parser, then stacking expression combinators via `|>` operator.
+/-!
+## Expression Combinators
+
+The correct way to expression combinators, is based on an atom parser, then stacking expression combinators via `|>` operator. The stack order is the precedence order.
+
+Here is an example:
+
+```lean
+def parseInt : Parsec Int := do
+  return (← many1Chars <| satisfy (λ c => c.isDigit)).toInt!
+
+def parseExpr : Parsec Int :=
+  parseInt
+  |> «prefix» [skipChar '-' *> return (- ·)]
+  |> binary [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
+  |> binary [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
+
+#eval parseExpr.run "1"
+#eval parseExpr.run "1+2*3"
+#eval parseExpr.run "-1+2*3"
+```
 -/
+
+/-- `binary` is a part of expression combinators -/
 def binary (opList : List (Parsec (α → α → α))) (tm : Parsec α)
   : Parsec α := do
   let l ← tm
@@ -46,9 +73,7 @@ def binary (opList : List (Parsec (α → α → α))) (tm : Parsec α)
         | .none => continue
       fail "cannot match operator"
 
-/-!
-«prefix» is a part of expression combinators
--/
+/-- `«prefix»` is a part of expression combinators -/
 def «prefix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
   : Parsec α := do
   let mut op := .none
@@ -62,13 +87,16 @@ def «prefix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
 
 section test
 
-example : (parens (skipChar 'a')).run "(a)" = .ok () := rfl
+#eval (parens (skipChar 'a')).run "(a)"
+#eval (parens (skipChar 'a')).run "( a  )"
 example : (tryP <| skipChar 'a').run "" = .ok .none := rfl
 example : (tryP <| skipChar 'a').run "a" = .ok (.some ()) := rfl
 
+private
 def parseInt : Parsec Int := do
   return (← many1Chars <| satisfy (λ c => c.isDigit)).toInt!
 
+private
 def parseExpr : Parsec Int :=
   parseInt
   |> «prefix» [skipChar '-' *> return (- ·)]
