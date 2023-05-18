@@ -12,13 +12,24 @@ jobs:
       - name: install elan
         run: |
           set -o pipefail
-          curl -sSfL https://github.com/leanprover/elan/releases/download/v1.4.2/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          curl -sSfL https://github.com/leanprover/elan/releases/download/v1.4.5/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
           ./elan-init -y --default-toolchain none
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
           echo | source $HOME/.profile && $HOME/.elan/bin/elan --version
       - uses: actions/checkout@v2
 
-      - name: Build
+      - name: Build & Check
         run: |
           lake update
           lake build
+
+      - name: Generate Document
+        run: |
+          lake -Kenv=dev udpate
+          lake -Kenv=dev build ParsecExtra:docs
+      - name: Deploy Document
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/doc
+          publish_branch: gh-pages
