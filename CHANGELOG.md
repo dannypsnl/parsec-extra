@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- rename to `«prefix»`, `«postfix»`, and `«mixfix»`
+
+  The problem is `prefix` and `postfix` are keywords of lean, since we have to wrap the them with `«»`, then we also rename `binary` to follow the same style.
+
 ## v0.1
 
 1. source position getter (raw and file map based)

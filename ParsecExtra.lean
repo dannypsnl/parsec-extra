@@ -50,8 +50,8 @@ def parseInt : Parsec Int := do
 def parseExpr : Parsec Int :=
   parseInt
   |> «prefix» [skipChar '-' *> return (- ·)]
-  |> binary [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
-  |> binary [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
+  |> «mixfix» [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
+  |> «mixfix» [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
 
 #eval parseExpr.run "1"
 #eval parseExpr.run "1+2*3"
@@ -59,8 +59,8 @@ def parseExpr : Parsec Int :=
 ```
 -/
 
-/-- `binary` is a part of expression combinators -/
-def binary (opList : List (Parsec (α → α → α))) (tm : Parsec α)
+/-- `«mixfix»` is a part of expression combinators -/
+def «mixfix» (opList : List (Parsec (α → α → α))) (tm : Parsec α)
   : Parsec α := do
   let l ← tm
   let rs ← many opRhs
@@ -85,8 +85,8 @@ def «prefix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
   | .none => return e
   | .some f => return f e
 
-/-- `suffix` is a part of expression combinators, stands for operator like factorial, e.g. `3!` -/
-def suffix (opList : List $ Parsec (α → α)) (tm : Parsec α)
+/-- `«postfix»` is a part of expression combinators, stands for operator like factorial, e.g. `3!` -/
+def «postfix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
   : Parsec α := do
   let e ← tm
   let mut op := .none
@@ -115,10 +115,10 @@ private partial def factorial : Int → Int
 
 private def parseExpr : Parsec Int :=
   parseInt
-  |> suffix [skipChar '!' *> return factorial]
+  |> «postfix» [skipChar '!' *> return factorial]
   |> «prefix» [skipChar '-' *> return (- ·)]
-  |> binary [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
-  |> binary [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
+  |> «mixfix» [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
+  |> «mixfix» [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
 
 #eval parseExpr.run "1"
 #eval parseExpr.run "1+2*3"
