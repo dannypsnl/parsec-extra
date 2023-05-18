@@ -73,7 +73,7 @@ def binary (opList : List (Parsec (α → α → α))) (tm : Parsec α)
         | .none => continue
       fail "cannot match operator"
 
-/-- `«prefix»` is a part of expression combinators -/
+/-- `«prefix»` is a part of expression combinators, stands for operator like negative, e.g. `-3` -/
 def «prefix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
   : Parsec α := do
   let mut op := .none
@@ -85,6 +85,18 @@ def «prefix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
   | .none => return e
   | .some f => return f e
 
+/-- `suffix` is a part of expression combinators, stands for operator like factorial, e.g. `3!` -/
+def suffix (opList : List $ Parsec (α → α)) (tm : Parsec α)
+  : Parsec α := do
+  let e ← tm
+  let mut op := .none
+  for findOp in opList do
+    op ← tryP findOp
+    if op.isSome then break
+  match op with
+  | .none => return e
+  | .some f => return f e
+
 section test
 
 #eval (parens (skipChar 'a')).run "(a)"
@@ -92,13 +104,18 @@ section test
 example : (tryP <| skipChar 'a').run "" = .ok .none := rfl
 example : (tryP <| skipChar 'a').run "a" = .ok (.some ()) := rfl
 
-private
-def parseInt : Parsec Int := do
-  return (← many1Chars <| satisfy (λ c => c.isDigit)).toInt!
+private def parseInt : Parsec Nat := do
+  return (← many1Chars <| satisfy (λ c => c.isDigit)).toNat!
 
-private
-def parseExpr : Parsec Int :=
+private partial def factorial : Int → Int
+  | 0 => 1
+  | n =>
+    if n < 0 then panic! "factorial: negative input"
+    else n * factorial (n-1)
+
+private def parseExpr : Parsec Int :=
   parseInt
+  |> suffix [skipChar '!' *> return factorial]
   |> «prefix» [skipChar '-' *> return (- ·)]
   |> binary [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
   |> binary [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
@@ -106,6 +123,7 @@ def parseExpr : Parsec Int :=
 #eval parseExpr.run "1"
 #eval parseExpr.run "1+2*3"
 #eval parseExpr.run "-1+2*3"
+#eval parseExpr.run "6!/2"
 
 end test
 
