@@ -1,21 +1,18 @@
 # parsec-extra
 
-This package intend to provide extras helpers for `Lean.Data.Parsec`, there has
+This package intend to provide extras helpers for `Lean.Data.Parsec`, check [document](https://dannypsnl.github.io/parsec-extra/ParsecExtra.html) for usage about package.
 
-1. `getPos`
-2. `getPosition`
-3. `runFilename`
+You can add the package into dependencies with the following setup
 
-for source location lookup. For higher-level combinator, there has
+```lean
+require «parsec-extra» from git "https://github.com/dannypsnl/parsec-extra" @ "main"
+```
 
-1. `tryP`
-2. `parens`
-3. `braces`
+Then using the following command to fetch dependencies
 
-To build up complex expression, there has
-
-1. `binary`
-2. `«prefix»`
+```shell
+lake update
+```
 
 ## Development
 
