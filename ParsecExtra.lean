@@ -28,4 +28,47 @@ def between (before : Parsec Unit) (p : Parsec a) (after : Parsec Unit) := do
 def parens (p : Parsec a) : Parsec a := between (skipChar '(') p (skipChar ')')
 def braces (p : Parsec a) : Parsec a := between (skipChar '{') p (skipChar '}')
 
+def binary (opList : List (Parsec (α → α → α))) (tm : Parsec α)
+  : Parsec α := do
+  let l ← tm
+  let rs ← many opRhs
+  return rs.foldl (fun lhs (bin, rhs) => (bin lhs rhs)) l
+  where
+    opRhs : Parsec ((α → α → α) × α) := do
+      for findOp in opList do
+        match ← tryP findOp with
+        | .some f => return ⟨ f, ← tm ⟩
+        | .none => continue
+      fail "cannot match operator"
+
+def «prefix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
+  : Parsec α := do
+  let mut op := .none
+  for findOp in opList do
+    op ← tryP findOp
+    if op.isSome then break
+  let e ← tm
+  match op with
+  | .none => return e
+  | .some f => return f e
+
+section test
+
+example : (parens (skipChar 'a')).run "(a)" = .ok () := rfl
+example : (tryP <| skipChar 'a').run "" = .ok .none := rfl
+example : (tryP <| skipChar 'a').run "a" = .ok (.some ()) := rfl
+
+def parseInt : Parsec Int := do
+  return (← many1Chars <| satisfy (λ c => c.isDigit)).toInt!
+
+def parseExpr : Parsec Int :=
+  parseInt
+  |> binary [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
+  |> binary [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
+
+#eval parseExpr.run "1"
+#eval parseExpr.run "1+2*3"
+
+end test
+
 end Lean.Parsec
