@@ -28,6 +28,11 @@ def between (before : Parsec Unit) (p : Parsec a) (after : Parsec Unit) := do
 def parens (p : Parsec a) : Parsec a := between (skipChar '(') p (skipChar ')')
 def braces (p : Parsec a) : Parsec a := between (skipChar '{') p (skipChar '}')
 
+/-!
+binary is a part of expression combinators
+
+The correct way to expression combinators, is based on an atom parser, then stacking expression combinators via `|>` operator.
+-/
 def binary (opList : List (Parsec (α → α → α))) (tm : Parsec α)
   : Parsec α := do
   let l ← tm
@@ -41,6 +46,9 @@ def binary (opList : List (Parsec (α → α → α))) (tm : Parsec α)
         | .none => continue
       fail "cannot match operator"
 
+/-!
+«prefix» is a part of expression combinators
+-/
 def «prefix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
   : Parsec α := do
   let mut op := .none

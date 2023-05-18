@@ -16,3 +16,18 @@ To build up complex expression, there has
 
 1. `binary`
 2. `«prefix»`
+
+## Development
+
+Build project
+
+```shell
+lake build
+```
+
+Generate document
+
+```shell
+lake update -Kenv=dev
+lake -Kenv=dev build ParsecExtra:docs
+```
