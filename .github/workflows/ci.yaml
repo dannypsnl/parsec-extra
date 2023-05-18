@@ -22,14 +22,3 @@ jobs:
         run: |
           lake update
           lake build
-
-      - name: Generate Document
-        run: |
-          lake -Kenv=dev udpate
-          lake -Kenv=dev build ParsecExtra:docs
-      - name: Deploy Document
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/doc
-          publish_branch: gh-pages
