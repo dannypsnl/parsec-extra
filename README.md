@@ -30,6 +30,12 @@ Build project
 lake build
 ```
 
+Run tests
+
+```shell
+lake exe lspec
+```
+
 Generate document
 
 ```shell
