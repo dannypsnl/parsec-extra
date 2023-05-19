@@ -10,5 +10,7 @@ lean_lib «ParsecExtra» {
   -- add library configuration options here
 }
 
-meta if get_config? env = some "dev" then -- dev is so not everyone has to build it
-require «doc-gen4» from git "https://github.com/leanprover/doc-gen4" @ "main"
+-- dev is so not everyone has to build it
+meta if get_config? env = some "dev" then
+  require «doc-gen4» from git "https://github.com/leanprover/doc-gen4" @ "main"
+  require «lspec» from git "https://github.com/lurk-lab/LSpec" @ "main"

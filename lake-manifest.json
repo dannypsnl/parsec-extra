@@ -8,6 +8,12 @@
     "name": "CMark",
     "inputRev?": "main"}},
   {"git":
+   {"url": "https://github.com/lurk-lab/LSpec",
+    "subDir?": null,
+    "rev": "88f7d23e56a061d32c7173cea5befa4b2c248b41",
+    "name": "lspec",
+    "inputRev?": "main"}},
+  {"git":
    {"url": "https://github.com/leanprover/lake",
     "subDir?": null,
     "rev": "257fc59a6464f5732a4f49e7dda0fc37475819fb",
