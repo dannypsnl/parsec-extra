@@ -1,5 +1,7 @@
 # parsec-extra
 
+[![ci](https://github.com/dannypsnl/parsec-extra/actions/workflows/ci.yaml/badge.svg)](https://github.com/dannypsnl/parsec-extra/actions/workflows/ci.yaml)
+
 This package intend to provide extras helpers for `Lean.Data.Parsec`, check [document](https://dannypsnl.github.io/parsec-extra/ParsecExtra.html) for usage about package.
 
 You can add the package into dependencies with the following setup in `lakefile.lean`
