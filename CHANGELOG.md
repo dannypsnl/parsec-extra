@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2
+
 - provide `mixfixR` to build right-associativity mixfix expression
 - add `withPosition`, which runs a parser, and wraps the result with start and end position
 - rename expression combinators to `«prefix»`, `«postfix»`, and `«mixfix»`
