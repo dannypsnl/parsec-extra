@@ -22,6 +22,7 @@ private def parseExpr : Parsec Int :=
   parseInt
   |> «postfix» [skipChar '!' *> return factorial]
   |> «prefix» [skipChar '-' *> return (- ·)]
+  |> «mixfixR» [skipString "^" *> return (fun x y => Int.pow x y.toNat)]
   |> «mixfix» [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
   |> «mixfix» [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
 
@@ -43,3 +44,5 @@ def main := lspecIO $
       (parseExpr.run "-1+2*3" == .ok 5)
     $ test "postfix operator"
       (parseExpr.run "6!/2" == .ok 360)
+    $ test "right associative operator"
+      (parseExpr.run "-1+2^2^3" == .ok 255)

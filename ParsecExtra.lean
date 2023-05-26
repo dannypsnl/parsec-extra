@@ -65,7 +65,7 @@ def parseExpr : Parsec Int :=
 ```
 -/
 
-/-- `«mixfix»` is a part of expression combinators -/
+/-- `«mixfix»` builds a mixfix expression -/
 def «mixfix» (opList : List (Parsec (α → α → α))) (tm : Parsec α)
   : Parsec α := do
   let l ← tm
@@ -77,7 +77,20 @@ def «mixfix» (opList : List (Parsec (α → α → α))) (tm : Parsec α)
     fail "cannot match any operator"
   return rs.foldl (fun lhs (bin, rhs) => (bin lhs rhs)) l
 
-/-- `«prefix»` is a part of expression combinators, stands for operator like negative, e.g. `-3` -/
+/-- `mixfixR` builds a mixfix right-associativity expression -/
+partial def mixfixR (opList : List (Parsec (α → α → α))) (tm : Parsec α)
+  : Parsec α := go #[]
+  where
+  go (ls : Array (α × (α → α → α))) : Parsec α := do
+    let lhs ← tm
+    for findOp in opList do
+      match ← tryP findOp with
+      | .some f => return ← go (ls.push (lhs, f))
+      | .none => continue
+    let rhs := lhs
+    return ls.foldr (fun (lhs, bin) rhs => bin lhs rhs) rhs
+
+/-- `«prefix»` builds a prefix expression, e.g. negative prefix `-3` -/
 def «prefix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
   : Parsec α := do
   let mut op := .none
@@ -88,7 +101,7 @@ def «prefix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
   | .none => tm
   | .some f => return f (← tm)
 
-/-- `«postfix»` is a part of expression combinators, stands for operator like factorial, e.g. `3!` -/
+/-- `«postfix»` builds a postfix expression, e.g. factorial `3!` -/
 def «postfix» (opList : List $ Parsec (α → α)) (tm : Parsec α)
   : Parsec α := do
   let e ← tm
