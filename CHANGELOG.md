@@ -6,7 +6,7 @@
 - add `withPosition`, which runs a parser, and wraps the result with start and end position
 - rename expression combinators to `«prefix»`, `«postfix»`, and `«mixfix»`
 
-  The problem is `prefix` and `postfix` are keywords of lean, since we have to wrap the them with `«»`, then we also rename `binary` to follow the same style.
+  Notice that `prefix` and `postfix` are keywords of lean, so we have to escape them by `«»`, then we rename `binary` to `mixfix` to follow the same style.
 
 ## v0.1
 
