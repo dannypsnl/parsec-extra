@@ -9,6 +9,16 @@ private instance [BEq α] : BEq (Except ε α) where
     | Except.ok a, Except.ok b => a == b
     | _, _ => false
 
+def miscTest := lspecIO $
+  test "parens test"
+    ((parens (skipChar 'a')).run "(a)" |> Except.isOk)
+  $ test "parens with some space"
+    ((parens (skipChar 'a')).run "( a  )" |> Except.isOk)
+  $ test "tryP fail should return Option.none"
+    ((tryP <| skipChar 'a').run "" == .ok .none)
+  $ test "tryP success should return Option.some and wrap parser result"
+    ((tryP <| skipChar 'a').run "a" == .ok (.some ()))
+
 private def parseInt : Parsec Nat := do
   return (← many1Chars <| satisfy (λ c => c.isDigit)).toNat!
 
@@ -26,23 +36,20 @@ private def parseExpr : Parsec Int :=
   |> «infixL» [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
   |> «infixL» [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
 
-def main := lspecIO $
-  test "parens test"
-    ((parens (skipChar 'a')).run "(a)" |> Except.isOk)
-  $ test "parens with some space"
-    ((parens (skipChar 'a')).run "( a  )" |> Except.isOk)
-  $ test "tryP fail should return Option.none"
-    ((tryP <| skipChar 'a').run "" |> (· == .ok .none))
-  $ test "tryP success should return Option.some and wrap parser result"
-    ((tryP <| skipChar 'a').run "a" |> (· == .ok (.some ())))
-  $ group "parse expression" $
-    test "integer"
-      (parseExpr.run "1" == .ok 1)
-    $ test "multiple first"
-      (parseExpr.run "1+2*3" == .ok 7)
-    $ test "prefix operator"
-      (parseExpr.run "-1+2*3" == .ok 5)
-    $ test "postfix operator"
-      (parseExpr.run "6!/2" == .ok 360)
-    $ test "right associative operator"
-      (parseExpr.run "-1+2^2^3" == .ok 255)
+def expressionTest := lspecIO $ group "parse expression" $
+  test "integer"
+    (parseExpr.run "1" == .ok 1)
+  $ test "multiple first"
+    (parseExpr.run "1+2*3" == .ok 7)
+  $ test "prefix operator"
+    (parseExpr.run "-1+2*3" == .ok 5)
+  $ test "postfix operator"
+    (parseExpr.run "6!/2" == .ok 360)
+  $ test "right associative operator"
+    (parseExpr.run "-1+2^2^3" == .ok 255)
+
+def main : IO UInt32 := do
+  return [
+    ← miscTest, 
+    ← expressionTest
+  ].foldl (· + ·) 0
