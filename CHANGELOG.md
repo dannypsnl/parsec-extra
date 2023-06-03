@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix wrong name `mixfix`, it actually is describing infix operator. For associativity, now name functions to
+  - `infixL`
+  - `infixR`
+
 ## v0.2
 
 - provide `mixfixR` to build right-associativity mixfix expression

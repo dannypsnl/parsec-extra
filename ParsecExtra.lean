@@ -56,8 +56,9 @@ def parseInt : Parsec Int := do
 def parseExpr : Parsec Int :=
   parseInt
   |> «prefix» [skipChar '-' *> return (- ·)]
-  |> «mixfix» [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
-  |> «mixfix» [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
+  |> «infixR» [skipString "^" *> return (Int.pow · ·.toNat)]
+  |> «infixL» [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
+  |> «infixL» [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
 
 #eval parseExpr.run "1"
 #eval parseExpr.run "1+2*3"
@@ -65,8 +66,8 @@ def parseExpr : Parsec Int :=
 ```
 -/
 
-/-- `«mixfix»` builds a mixfix expression -/
-def «mixfix» (opList : List (Parsec (α → α → α))) (tm : Parsec α)
+/-- `infixL` builds a infix left-associativity expression -/
+def infixL (opList : List (Parsec (α → α → α))) (tm : Parsec α)
   : Parsec α := do
   let l ← tm
   let rs ← many do
@@ -77,8 +78,8 @@ def «mixfix» (opList : List (Parsec (α → α → α))) (tm : Parsec α)
     fail "cannot match any operator"
   return rs.foldl (fun lhs (bin, rhs) => (bin lhs rhs)) l
 
-/-- `mixfixR` builds a mixfix right-associativity expression -/
-partial def mixfixR (opList : List (Parsec (α → α → α))) (tm : Parsec α)
+/-- `infixR` builds a infix right-associativity expression -/
+partial def infixR (opList : List (Parsec (α → α → α))) (tm : Parsec α)
   : Parsec α := go #[]
   where
   go (ls : Array (α × (α → α → α))) : Parsec α := do

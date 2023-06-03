@@ -22,9 +22,9 @@ private def parseExpr : Parsec Int :=
   parseInt
   |> «postfix» [skipChar '!' *> return factorial]
   |> «prefix» [skipChar '-' *> return (- ·)]
-  |> «mixfixR» [skipString "^" *> return (fun x y => Int.pow x y.toNat)]
-  |> «mixfix» [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
-  |> «mixfix» [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
+  |> «infixR» [skipString "^" *> return (Int.pow · ·.toNat)]
+  |> «infixL» [skipChar '*' *> return (· * ·), skipChar '/' *> return (· / ·)]
+  |> «infixL» [skipChar '+' *> return (· + ·), skipChar '-' *> return (· - ·)]
 
 def main := lspecIO $
   test "parens test"
