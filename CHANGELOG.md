@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.3
+
 - provide `brackets`
 - provide an optional argument for `parens` & `braces` to select whitespace parser
 - fix wrong name `mixfix`, it actually is describing infix operator. For associativity, now name functions to
