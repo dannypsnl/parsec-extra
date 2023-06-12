@@ -33,14 +33,16 @@ def tryP (p : Parsec a) : Parsec (Option a) := λ it =>
   | .success rem a => .success rem a
   | .error _ _ => .success it .none
 
-private
-def between (before : Parsec Unit) (p : Parsec a) (after : Parsec Unit) := do
-  before; ws; let r ← p; ws; after; ws
+private def between (before : Parsec Unit) (p : Parsec a) (after : Parsec Unit)
+  (user_ws : Parsec Unit := ws) := do
+  before; user_ws; let r ← p; user_ws; after; user_ws
   return r
 /-- `parens` wrap expression with parenthesis `(` and `)` -/
-def parens (p : Parsec a) : Parsec a := between (skipChar '(') p (skipChar ')')
+def parens (p : Parsec a) (user_ws : Parsec Unit := ws) : Parsec a :=
+  between (skipChar '(') p (skipChar ')') user_ws
 /-- `braces` wrap expression with braces `{` and `}` -/
-def braces (p : Parsec a) : Parsec a := between (skipChar '{') p (skipChar '}')
+def braces (p : Parsec a) (user_ws : Parsec Unit := ws) : Parsec a :=
+  between (skipChar '{') p (skipChar '}') user_ws
 
 /-!
 ## Expression Combinators
