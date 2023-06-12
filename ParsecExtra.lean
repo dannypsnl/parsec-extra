@@ -40,6 +40,9 @@ private def between (before : Parsec Unit) (p : Parsec a) (after : Parsec Unit)
 /-- `parens` wrap expression with parenthesis `(` and `)` -/
 def parens (p : Parsec a) (user_ws : Parsec Unit := ws) : Parsec a :=
   between (skipChar '(') p (skipChar ')') user_ws
+/-- `brackets` wrap expression with parenthesis `[` and `]` -/
+def brackets (p : Parsec a) (user_ws : Parsec Unit := ws) : Parsec a :=
+  between (skipChar '[') p (skipChar ']') user_ws
 /-- `braces` wrap expression with braces `{` and `}` -/
 def braces (p : Parsec a) (user_ws : Parsec Unit := ws) : Parsec a :=
   between (skipChar '{') p (skipChar '}') user_ws
