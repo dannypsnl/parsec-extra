@@ -8,8 +8,7 @@ sources:
   - https://git.sr.ht/~dannypsnl/parsec-extra
 tasks:
   - install-elan: |
-      nix-env -iA nixos.elan
-      nix-env -iA nixos.hut
+      nix-env -iA nixos.elan nixos.hut nixos.gcc13
   - setup-toolchain: |
       elan default stable
   - package: |
