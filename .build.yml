@@ -9,7 +9,9 @@ tasks:
   - setup-toolchain: |
       elan default stable
   - build: |
+      cd parsec-extra
       lake update
       lake build
   - test: |
+      cd parsec-extra
       lake exe lspec
