@@ -1,4 +1,4 @@
-image: nixos
+image: nixos/latest
 repositories:
   nixpkgs: https://nixos.org/channels/nixpkgs-unstable
 sources:
