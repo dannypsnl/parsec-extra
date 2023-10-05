@@ -6,6 +6,8 @@ sources:
 tasks:
   - install-elan: |
       nix-env -iA nixpkgs.elan
+  - setup-toolchain: |
+      elan default stable
   - build: |
       lake update
       lake build
