@@ -1,0 +1,22 @@
+image: nixos/latest
+oauth: pages.sr.ht/PAGES:RW
+packages:
+- hut
+environment:
+  site: dannypsnl.srht.site
+repositories:
+  nixpkgs: https://nixos.org/channels/nixpkgs-unstable
+sources:
+  - https://git.sr.ht/~dannypsnl/parsec-extra
+tasks:
+  - install-elan: |
+      nix-env -iA nixpkgs.elan
+  - setup-toolchain: |
+      elan default stable
+  - package: |
+      cd parsec-extra
+      lake -Kenv=dev update
+      lake -Kenv=dev build ParsecExtra:docs
+      tar -cvz docs > ../site.tar.gz
+  - upload: |
+      hut pages publish -d $site site.tar.gz
