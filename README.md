@@ -7,7 +7,7 @@ This package intend to provide extras helpers for `Lean.Data.Parsec`, check [doc
 You can add the package into dependencies with the following setup in `lakefile.lean`
 
 ```lean
-require «parsec-extra» from git "https://github.com/dannypsnl/parsec-extra" @ "main"
+require «parsec-extra» from git "https://git.sr.ht/~dannypsnl/parsec-extra" @ "main"
 ```
 
 Then using the following command to fetch dependencies
