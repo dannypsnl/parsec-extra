@@ -5,7 +5,7 @@ sources:
   - https://git.sr.ht/~dannypsnl/parsec-extra
 tasks:
   - install-elan: |
-      nix-env -iA nixpkgs.elan
+      nix-env -iA nixos.elan
   - setup-toolchain: |
       elan default stable
   - build: |

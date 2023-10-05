@@ -1,7 +1,5 @@
 image: nixos/latest
 oauth: pages.sr.ht/PAGES:RW
-packages:
-- hut
 environment:
   site: dannypsnl.srht.site
 repositories:
@@ -10,7 +8,8 @@ sources:
   - https://git.sr.ht/~dannypsnl/parsec-extra
 tasks:
   - install-elan: |
-      nix-env -iA nixpkgs.elan
+      nix-env -iA nixos.elan
+      nix-env -iA nixos.hut
   - setup-toolchain: |
       elan default stable
   - package: |
