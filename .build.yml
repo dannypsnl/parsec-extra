@@ -1,0 +1,11 @@
+image: archlinux
+packages:
+  - elan
+sources:
+  - https://git.sr.ht/~dannypsnl/parsec-extra
+tasks:
+  - build: |
+      lake update
+      lake build
+  - test: |
+      lake exe lspec
